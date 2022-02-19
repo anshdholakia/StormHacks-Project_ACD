@@ -1,42 +1,55 @@
 from flask import Flask
 from flask import request 
 
+import yfinance as yf
+import pandas as pd
+from get_stats import get_stats
+
 app = Flask(__name__)
 
 
-def ticker_exists(ticker: str) -> bool:
-    # Not yet implemented, assume true for now
-    return True
+def try_get_data(ticker: str):
+    df = pd.DataFrame()
+
+    if ticker == None:
+        return df 
+
+    ticker = yf.Ticker(ticker)
+
+    if ticker.info["regularMarketPrice"] == None:
+        return df 
+    else:
+        df = ticker.history(period='2y')[['Open', 'High', 'Low', 'Close', 'Volume']]
+        return df
 
 
-def get_stock_data(ticker: str):
-    # Not yet implemented
-    return {}
-
-
-def get_stats(stock_data):
-    # Not yet implemented, Chau's module
-    return {}
+def get_stats_wrapper(stock_data):
+    return get_stats(stock_data)
+    # return "{}"
 
 
 def get_predictions(stock_data):
     # Not yet implemented, Ansh's module
-    return {}
+    return "{}"
 
 
-@app.route("/analyze", methods=["GET"])
+def make_json_response(stat_string, pred_string):
+    return '{"stats": ' + stat_string + ',"pred": ' + pred_string + '}'
+
+
+
+@app.route('/analyze', methods=['GET'])
 def analyze():
-    ticker = request.args.get("ticker")
+    ticker = request.args.get('ticker')
 
-    if not ticker_exists(ticker):
-        # If invalid ticker, return empty data. To be parsed on the front end.
-        return data
+    stock_data = try_get_data(ticker)
 
-    stock_data = get_stock_data(ticker)
-    stats = get_stats(stock_data) # chau's module
+    if stock_data.empty:
+        return "stock does not exist!"
+
+    stats = get_stats_wrapper(stock_data) # chau's module
     predictions = get_predictions(stock_data) # ansh's module
 
-    return {
-            "stats": stats,
-            "predictions": predictions
-            }
+    response = make_json_response(stats, predictions)
+    print(response)
+    return response
