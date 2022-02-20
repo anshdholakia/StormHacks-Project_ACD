@@ -13,7 +13,8 @@ import numpy as np
 import json
 
 # get historical market data
-def predictions(hist):
+def predictions(data):
+    hist = data.copy()
     style.use('ggplot')
 
     # JSON file for company information
@@ -69,4 +70,4 @@ def predictions(hist):
     return hist #the last 30 are the predictions by the model
 
 if __name__ == '__main__':
-    print(yf.Ticker('MSFT').history("2y"))
+    predictions(yf.Ticker('MSFT').history("2y"))
