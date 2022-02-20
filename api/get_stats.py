@@ -12,6 +12,7 @@ def get_stats(stock_data):
 # Testing
 if __name__ == "__main__":
     data = yf.Ticker("MSFT")
+    print(data.info)
     data_points = data.history(period="2y")[['Open', 'High', 'Low', 'Close', 'Volume']]
     data_json = get_stats(data_points)
 
