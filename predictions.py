@@ -30,16 +30,25 @@ def predictions(ticker):
     last_date = hist.tail(1).index.item()
 
     dti = pd.date_range(last_date, periods=no_of_days+1, freq="D")
- 
+    t = hist.copy() #making a copy
     for i in range(no_of_days):
-        hist.loc[dti[i+1]] = [nan, nan, nan, nan] 
+        hist.loc[dti[i+1]] = [hist['Close'].mean(axis = 0), hist['HL_PCT'].mean(axis = 0), hist['PCT_change'].mean(axis = 0), hist['Volume'].mean(axis = 0)]
 
     hist['label'] = hist[forecast_col].shift(-no_of_days) # Making the label attribute for values to be predicted
-    # print(hist['label'])
-    # hist.dropna(inplace = True)
-    # X = np.array(hist.drop(['label'], 1))
-    # y = np.array(hist['label'])
-    # X = preprocessing.scale(X)
+    hist.dropna(inplace=True)
+    X = np.array(hist.drop(['label'], 1))
+    y = np.array(hist['label'])
+    X = preprocessing.scale(X)
+    y=np.array(hist['label'])
+
+    X_train, X_test, y_train, y_test=train_test_split(X, y, test_size=0.2)
+    clf = LinearRegression()
+    clf.fit(X_train, y_train)
+    accurate = clf.score(X_test, y_test)
+    print(accurate) # Accuracy averages around 79.9%
+
+
+
     
     
 
