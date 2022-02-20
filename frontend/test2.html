@@ -6,8 +6,12 @@ fetch('http://127.0.0.1:5000/analyze?ticker=msft')
 .then(response => response.json())
 .then(data => render_graph(data));
 const render_graph = data => {
-    const currentData = data['pred'];
+    const currentData = data['stats']['Close'];
+    const predictions = data['preds']['Forecast'];
     // console.log(currentData);
+    let pxVals = Object.getOwnPropertyNames(predictions);
+    pxVals = pxVals.map(Number);
+    let pyVals = Object.values(predictions);
     let xVals = Object.getOwnPropertyNames(currentData);
     xVals = xVals.map(Number);
     let yVals = Object.values(currentData);
@@ -15,15 +19,28 @@ const render_graph = data => {
     var limit = 761; 
     var data = [];
     var dataSeries = { type: "line" };
+    var predSeries = { type: "line", markerSize: 1 }
     var dataPoints = [];
+    var predPoints = [];
+
     for (var i = 0; i < xVals.length ; i += 1) {
         dataPoints.push({
-            x: i+1,
+            x: new Date(xVals[i]),
             y: yVals[i]
         });
     }
+
+    predPoints.push({x:new Date(xVals[xVals.length-1]), y:yVals[yVals.length-1]});
+    for( var j  = 0; j<pxVals.length; j++){
+        predPoints.push({
+            x:new Date(pxVals[j]),
+            y: pyVals[j]
+        })
+    }
     dataSeries.dataPoints = dataPoints;
+    predSeries.dataPoints = predPoints;
     data.push(dataSeries);
+    data.push(predSeries);
 
     //Better to construct options first and then pass it as a parameter
     var options = {
