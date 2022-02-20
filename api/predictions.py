@@ -1,15 +1,19 @@
 from cmath import nan
+import json
+import datetime
 import yfinance as yf
 from sklearn import preprocessing, svm
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import style
 import math
 import numpy as np
-
+import json
 
 def predictions(ticker):
+    style.use('ggplot')
 
     obj1 = yf.Ticker(ticker)
 
@@ -30,26 +34,42 @@ def predictions(ticker):
     last_date = hist.tail(1).index.item()
 
     dti = pd.date_range(last_date, periods=no_of_days+1, freq="D")
-    t = hist.copy() #making a copy
     for i in range(no_of_days):
         hist.loc[dti[i+1]] = [hist['Close'].mean(axis = 0), hist['HL_PCT'].mean(axis = 0), hist['PCT_change'].mean(axis = 0), hist['Volume'].mean(axis = 0)]
 
-    hist['label'] = hist[forecast_col].shift(-no_of_days) # Making the label attribute for values to be predicted
-    hist.dropna(inplace=True)
+    hist['label'] = hist[forecast_col].copy().shift(-no_of_days) # Making the label attribute for values to be predicted
     X = np.array(hist.drop(['label'], 1))
+    X = X[:-no_of_days]
+    X_lately = X[-no_of_days:]
+
+    hist.dropna(inplace=True)
     y = np.array(hist['label'])
-    X = preprocessing.scale(X)
-    y=np.array(hist['label'])
 
     X_train, X_test, y_train, y_test=train_test_split(X, y, test_size=0.2)
-    clf = LinearRegression()
+    clf = LinearRegression(n_jobs=-1)
     clf.fit(X_train, y_train)
     accurate = clf.score(X_test, y_test)
-    print(accurate) # Accuracy averages around 79.9%
+    # print(accurate) # Accuracy averages around 79.9%
 
+    predictions = clf.predict(X_lately)
+    print(predictions)
 
+    hist['Forecast'] = np.nan
+    last_date = hist.iloc[-1].name
+    last_unix = last_date.timestamp()
+    one_day = 86400
+    next_unix = last_unix + one_day
 
-    
+    for i in predictions:
+        next_date = datetime.datetime.fromtimestamp(next_unix)
+        next_unix+=one_day
+        hist.loc[next_date] = [np.nan for _ in range(len(hist.columns) - 1)] + [i]
+    hist['Close'].plot()
+    hist['Forecast'].plot()
+    plt.legend(loc=4)
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.show()
     
 
 
