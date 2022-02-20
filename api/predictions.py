@@ -12,16 +12,13 @@ import math
 import numpy as np
 import json
 
-def predictions(ticker):
+# get historical market data
+def predictions(hist):
     style.use('ggplot')
-
-    obj1 = yf.Ticker(ticker)
 
     # JSON file for company information
     # print(obj1.info)
 
-    # get historical market data
-    hist = obj1.history(period="2y")
     hist = hist[['Open','High', 'Low', 'Close','Volume', 'Dividends','Stock Splits']]
     hist['HL_PCT'] = (hist['High']-hist['Close'])/hist['Close'] * 100.0 # high-low percentage
     hist['PCT_change'] = (hist['Close'] - hist['Open']) / hist['Open'] * 100.0 # Percentage change
@@ -48,38 +45,28 @@ def predictions(ticker):
     X_train, X_test, y_train, y_test=train_test_split(X, y, test_size=0.2)
     clf = LinearRegression(n_jobs=-1)
     clf.fit(X_train, y_train)
-    accurate = clf.score(X_test, y_test)
+    # accurate = clf.score(X_test, y_test)
     # print(accurate) # Accuracy averages around 79.9%
 
     predictions = clf.predict(X_lately)
-    print(predictions)
 
     hist['Forecast'] = np.nan
-    last_date = hist.iloc[-1].name
-    last_unix = last_date.timestamp()
-    one_day = 86400
-    next_unix = last_unix + one_day
+    start_date = hist.head(1).index.item()
+    last_date = hist.tail(1).index.item()
 
-    for i in predictions:
-        next_date = datetime.datetime.fromtimestamp(next_unix)
-        next_unix+=one_day
-        hist.loc[next_date] = [np.nan for _ in range(len(hist.columns) - 1)] + [i]
-    hist['Close'].plot()
-    hist['Forecast'].plot()
-    plt.legend(loc=4)
-    plt.xlabel('Date')
-    plt.ylabel('Price')
-    plt.show()
+    dtti = pd.date_range(start_date, periods=len(hist)-no_of_days, freq="D")
+    dti = pd.date_range(last_date, periods=no_of_days+1, freq="D")
+    k=0
+    for i in dtti:
+        hist.loc[i] = [np.nan for _ in range(len(hist.columns) - 1)] + [np.array(hist['Close'])[k]]
+        k+=1
+
+    for i,j in zip(range(no_of_days),predictions):
+        hist.loc[dti[i+1]] = [np.nan for _ in range(len(hist.columns) - 1)] + [j]
+
+    hist = hist.drop(['Close', 'HL_PCT', 'PCT_change', 'Volume', 'label'], 1)
     
-
-
-
-    # print(hist)
-    # hist['Close'].plot(figsize=(16, 9))
-    # plt.show()
-
-    # for i in data.__dict__:
-    #     print(i,"=>", getattr(data, i),"\n\n")
+    return hist #the last 30 are the predictions by the model
 
 if __name__ == '__main__':
-    predictions('MSFT')
+    print(predictions(yf.Ticker('MSFT').history("2y")))
