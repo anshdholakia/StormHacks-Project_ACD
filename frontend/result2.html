@@ -60,8 +60,8 @@
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                     <div class="text-bg">
                      <span id="stock-name"></span>
-                      <h1>Trading Price here</h1>
-                      <p id="summary">Long_Summary</p>
+                      <h1 id="price">Loading...</h1>
+                      <p id="summary">Loading...</p>
                     
                   
                     </div>
@@ -84,8 +84,8 @@
 <div id="about" class="about">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12" id="graph">
-        <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+      <div id="graph">
+        <div id="chartContainer" style="height: 800px; width: 100%;"></div>
         <select id="stats" onchange="newRender(this.value);" onfocus="this.selectedIndex = -1;"></select>
         <span id="tickerName"></span>
       </div>
@@ -123,6 +123,8 @@
             const renderInfo = data => {
                 let summary = document.getElementById("summary");
                 summary.innerHTML = data["longBusinessSummary"];
+                let price = document.getElementById("price");
+                price.innerHTML = `$${parseFloat(data["bid"]).toFixed(2)}`;
             }
         </script>
 
@@ -146,7 +148,6 @@
               let xVals = Object.getOwnPropertyNames(currentData);
               xVals = xVals.map(Number);
               let yVals = Object.values(currentData);
-              const ctx = document.getElementById('myChart');
               var limit = 761; 
               var data = [];
               var dataSeries = { type: "line" };
@@ -178,7 +179,9 @@
                   zoomEnabled: true,
                   animationEnabled: true,
                   title: {
-                      text: "Stock Predictions for the next 30 days"
+                      text: "Stock Predictions for the next 30 days",
+                      fontFamily: "tahoma",
+                      fontSize: 25
                   },
                   axisY: {
                       lineThickness: 1
@@ -219,7 +222,6 @@
               let xVals = Object.getOwnPropertyNames(currentData);
               xVals = xVals.map(Number);
               let yVals = Object.values(currentData);
-              const ctx = document.getElementById('myChart');
               var limit = 761; 
               var data = [];
               var dataSeries = { type: "line" };
@@ -237,7 +239,9 @@
                   zoomEnabled: true,
                   animationEnabled: true,
                   title: {
-                      text: `{newValue} (2-Years)`
+                      text: `${newValue} (2-Years)`,
+                      fontFamily: 'tahoma',
+                      fontSize: 25
                   },
                   axisY: {
                       lineThickness: 1
