@@ -116,7 +116,7 @@
 }
           </script>
         <script>
-            fetch(`http://stormhacks2022-adc/description?ticker=${localStorage.getItem("Stock")}`)
+            fetch(`https://stormhacks2022-adc.herokuapp.com/description?ticker=${localStorage.getItem("Stock")}`)
             .then(response => response.json())
             .then(data => renderInfo(data));
             
@@ -131,7 +131,7 @@
         <script>
 
           let json_data = "";
-          fetch(`http://stormhacks2022-adc.herokuapp.com/analyze?ticker=${localStorage.getItem("Stock")}`)
+          fetch(`https://stormhacks2022-adc.herokuapp.com/analyze?ticker=${localStorage.getItem("Stock")}`)
           .then(response => response.json())
           .then(data => render_initial_data(data));
           
