@@ -13,18 +13,27 @@
     <script>
         const render_graph = data => {
             const currentData = data['stats']['Open'];
+            // console.log(currentData);
             let xVals = Object.getOwnPropertyNames(currentData);
             xVals = xVals.map(Number);
             let yVals = Object.values(currentData);
             const ctx = document.getElementById('myChart');
+            console.log(xVals[0]);
+            console.log(yVals[0]);
 
             const chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    xVals,
+                    datasets: [{
+                        label: 'Date',
+                        data: xVals,
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1,
+                    }],
                     datasets: [{
                         label: 'Opening Price',
                         data: yVals,
+                        borderColor: 'rgb(75, 192, 0)',
                         borderWidth: 1,
                     }]
                 },
@@ -35,18 +44,10 @@
                     title: {
                         display: true,
                         text: 'MSFT',
-                    },
-                    scales: {
-                        xAxes: [{
-                            type: 'time',
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'lll',
-                            }
-                        }]
                     }
 
-                })
-            }
+                }
+            })
+        }
     </script>
 </html>

@@ -69,4 +69,4 @@ def predictions(hist):
     return hist #the last 30 are the predictions by the model
 
 if __name__ == '__main__':
-    print(predictions(yf.Ticker('MSFT').history("2y")))
+    print(yf.Ticker('MSFT').history("2y"))
