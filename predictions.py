@@ -67,7 +67,7 @@ def predictions(data):
 
     hist = hist.drop(['Close', 'HL_PCT', 'PCT_change', 'Volume', 'label'], 1)
     
-    return hist #the last 30 are the predictions by the model
+    return hist.tail(30) #the last 30 are the predictions by the model
 
 if __name__ == '__main__':
     predictions(yf.Ticker('MSFT').history("2y"))
