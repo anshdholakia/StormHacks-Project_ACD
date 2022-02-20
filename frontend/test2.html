@@ -4,8 +4,8 @@
 <script>
 
 let json_data = "";
-
-fetch('http://127.0.0.1:5000/analyze?ticker=msft')
+const tick = urlParams.get('Ticker');
+fetch(`http://127.0.0.1:5000/analyze?ticker=${tick}`)
 .then(response => response.json())
 .then(data => render_initial_data(data));
 
