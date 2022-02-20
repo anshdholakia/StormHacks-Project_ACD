@@ -6,8 +6,6 @@ from sklearn import preprocessing, svm
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib import style
 import math
 import numpy as np
 import json
