@@ -357,6 +357,15 @@
 }
 
  
+#header {
+    position: fixed;
+    z-index: 1000;
+    top: 0px;
+    height: 0px;
+    width: 100%;
+    
+    
+}
  .right_cart_section {
      float: right;
      width: auto;
@@ -1006,7 +1015,7 @@ width: 24%;
  .banner_Client {
      position: relative;
 }
- .text-bg {text-align: left;}
+ .text-bg {text-align: center;}
   .text-bg span {
        font-size: 41px;
     line-height: 51px;
@@ -1034,7 +1043,7 @@ font-weight: bold;
      padding: 15px 30px;
      box-shadow: inherit;
      border: inherit;
-     width: 60%;
+     width: 70.9%;
      font-size: 19px;
      box-shadow: #b0b0b0 0px -2px 9px 0px;
 
@@ -1085,7 +1094,7 @@ margin-right: 10px;
 }
  .text {
      position: inherit;
-     text-align: left;
+     text-align: ;
      background: #0fbbad;
      width: 100%;
      bottom: auto;
@@ -1121,7 +1130,13 @@ margin-right: 10px;
      color: #000;
 }
 
-.carousel-caption {position: inherit;}
+.carousel-caption {
+    position: inherit;
+    justify-content: center;
+    align-items: center;
+    
+    
+}
 .carousel-indicators .active {
     background-color: #1a1b19;
 }
@@ -1208,7 +1223,7 @@ border-radius: 30px;
 /** Stock section **/
 .Stock {
      background-color: #fff;
-     margin-top: 70px;
+    
 }
 
 .Stock_shop h3 {
