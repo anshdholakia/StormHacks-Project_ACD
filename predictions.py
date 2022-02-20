@@ -13,7 +13,6 @@ import json
 # get historical market data
 def predictions(data):
     hist = data.copy()
-    style.use('ggplot')
 
     # JSON file for company information
     # print(obj1.info)
