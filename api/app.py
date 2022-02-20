@@ -1,9 +1,13 @@
 from flask import Flask
 from flask import request 
+from flask import jsonify
 
+import json
 import yfinance as yf
 import pandas as pd
 from get_stats import get_stats
+
+import requests as req
 
 app = Flask(__name__)
 
@@ -16,7 +20,7 @@ def try_get_data(ticker: str):
 
     ticker = yf.Ticker(ticker)
 
-    if ticker.info["regularMarketPrice"] == None:
+    if ticker.info['regularMarketPrice'] == None:
         return df 
     else:
         df = ticker.history(period='2y')[['Open', 'High', 'Low', 'Close', 'Volume']]
@@ -25,17 +29,17 @@ def try_get_data(ticker: str):
 
 def get_stats_wrapper(stock_data):
     return get_stats(stock_data)
-    # return "{}"
 
 
 def get_predictions(stock_data):
     # Not yet implemented, Ansh's module
-    return "{}"
+    return {}
 
 
-def make_json_response(stat_string, pred_string):
-    return '{"stats": ' + stat_string + ',"pred": ' + pred_string + '}'
-
+def make_response(stats, preds):
+    stats_json = stats.to_json(date_format='iso')
+    response = {'stats': json.loads(stats_json), 'preds': ''}
+    return response
 
 
 @app.route('/analyze', methods=['GET'])
@@ -45,11 +49,12 @@ def analyze():
     stock_data = try_get_data(ticker)
 
     if stock_data.empty:
-        return "stock does not exist!"
+        return 'stock does not exist!'
 
     stats = get_stats_wrapper(stock_data) # chau's module
     predictions = get_predictions(stock_data) # ansh's module
 
-    response = make_json_response(stats, predictions)
+    response = make_response(stats, predictions)
     print(response)
-    return response
+    return jsonify(response)
+
