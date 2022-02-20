@@ -2,10 +2,17 @@
 <html>
 <head>
 <script>
+
+let json_data = "";
+
 fetch('http://127.0.0.1:5000/analyze?ticker=msft')
 .then(response => response.json())
-.then(data => render_graph(data));
-const render_graph = data => {
+.then(data => render_initial_data(data));
+
+const render_initial_data = data => {
+    json_data = data;
+    initSelect(data['stats']);
+
     const currentData = data['stats']['Close'];
     const predictions = data['preds']['Forecast'];
     // console.log(currentData);
@@ -61,6 +68,65 @@ const render_graph = data => {
     var endTime = new Date();
     document.getElementById("tickerName").innerHTML = "Ticker name: ";
 }
+
+const initSelect = data => {
+    let select = document.getElementById('stats');
+    let values = Object.getOwnPropertyNames(data);
+    values[0] = "Closing + Predictions";
+    for (const val of values)
+    {
+        let option = document.createElement("option");
+        option.value = val;
+        option.text = val.charAt(0).toUpperCase() + val.slice(1);
+        select.appendChild(option);
+    }
+}
+
+const newRender = newValue => {
+    console.log(newValue);
+    console.log(newValue == "Closing + Predictions");
+    if (newValue == "Closing + Predictions") {
+        console.log(json_data);
+        render_initial_data(json_data);
+        return;
+    }
+
+    const currentData = json_data['stats'][newValue];
+    let xVals = Object.getOwnPropertyNames(currentData);
+    xVals = xVals.map(Number);
+    let yVals = Object.values(currentData);
+    const ctx = document.getElementById('myChart');
+    var limit = 761; 
+    var data = [];
+    var dataSeries = { type: "line" };
+    var dataPoints = [];
+    for (var i = 0; i < xVals.length ; i += 1) {
+        dataPoints.push({
+            x: new Date(xVals[i]),
+            y: yVals[i]
+        });
+    }
+    dataSeries.dataPoints = dataPoints;
+    data.push(dataSeries);
+
+    var options = {
+        zoomEnabled: true,
+        animationEnabled: true,
+        title: {
+            text: `{newValue} (2-Years)`
+        },
+        axisY: {
+            lineThickness: 1
+        },
+        data: data  // random data
+    };
+
+    var chart = new CanvasJS.Chart("chartContainer", options);
+    var startTime = new Date();
+    chart.render();
+    var endTime = new Date();
+    document.getElementById("tickerName").innerHTML = "Ticker name: ";
+}
 </script>
 <style>
 	#tickerName {
@@ -76,8 +142,8 @@ const render_graph = data => {
 </head>
 <body>
 <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+<select id="stats" onchange="newRender(this.value);" onfocus="this.selectedIndex = -1;"></select>
 <span id="tickerName"></span>
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-
 </body>
 </html>
